@@ -17,6 +17,9 @@ const citasSchema = new Schema({
         type: Schema.ObjectId,
         ref: "User"
     },
+    citado:{
+        type: String
+    },
     status:{
         type: Boolean,
         default: true

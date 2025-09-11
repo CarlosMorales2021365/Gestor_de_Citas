@@ -2,11 +2,11 @@ import Citas from './citas.model.js';
 
 export const createCita = async (req, res) => {
     try {
-        const { lugar, fecha, hora, minuto } = req.body;
+        const { lugar, fecha, hora, minuto, citado } = req.body;
         const { usuario } = req;
 
         // Corrige la propiedad: debe ser 'usuario'
-        const citas = new Citas({ lugar, fecha, hora, minuto, usuario: usuario._id });
+        const citas = new Citas({ lugar, fecha, hora, minuto, citado, usuario: usuario._id });
         await citas.save();
 
         // Popula los datos del usuario, incluyendo el nombre
