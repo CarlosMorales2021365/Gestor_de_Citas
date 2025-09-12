@@ -1,24 +1,42 @@
 import Citas from './citas.model.js';
+import User from '../user/user.model.js';
 
 export const createCita = async (req, res) => {
     try {
         const { lugar, fecha, hora, minuto, candidato } = req.body;
-        const { usuario } = req;
+        const { usuario } = req; // Reclutador viene del token
 
-        // Corrige la propiedad: debe ser 'usuario'
-        const citas = new Citas({ lugar, fecha, hora, minuto, candidato, usuario: usuario._id });
+        // 🔎 Buscar al candidato por nombre
+        const candidatoUser = await User.findOne({ nombre: candidato });
+        if (!candidatoUser) {
+            return res.status(404).json({
+                success: false,
+                msg: `No se encontró candidato con el nombre ${candidato}`
+            });
+        }
+
+        // Guardar la cita con el _id real del candidato
+        const citas = new Citas({
+            lugar,
+            fecha,
+            hora,
+            minuto,
+            candidato: candidatoUser._id,
+            usuario: usuario._id
+        });
         await citas.save();
 
-        // Popula los datos del usuario, incluyendo el nombre
+        // Populamos usuario (reclutador) y candidato
         const citasConDatos = await Citas.findById(citas._id)
-            .populate("usuario", "nombre apellido empresa telefono");
+            .populate("usuario", "nombre apellido empresa telefono email")
+            .populate("candidato", "nombre apellido email telefono");
 
-        // Puedes acceder al nombre así:
         const nombreUsuario = citasConDatos.usuario?.nombre;
+        const nombreCandidato = citasConDatos.candidato?.nombre;
 
         return res.status(200).json({
             success: true,
-            msg: `Cita creada correctamente para ${nombreUsuario}`,
+            msg: `Cita creada correctamente entre ${nombreUsuario} y ${nombreCandidato}`,
             citas: citasConDatos
         });
     } catch (error) {
@@ -27,14 +45,15 @@ export const createCita = async (req, res) => {
             error
         });
     }
-}
+};
 
 export const listarCitas = async (req, res) => {
   try {
     const userId = req.usuario._id; 
 
     const citas = await Citas.find({ usuario: userId })
-      .populate("usuario", "nombre apellido empresa telefono");
+      .populate("usuario", "nombre apellido empresa telefono")
+      .populate("candidato", "nombre apellido email telefono");
 
     return res.status(200).json({
       success: true,

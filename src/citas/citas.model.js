@@ -18,7 +18,8 @@ const citasSchema = new Schema({
         ref: "User"
     },
     candidato:{
-        type: String
+        type: Schema.ObjectId,
+        ref: "User"
     },
     status:{
         type: Boolean,
