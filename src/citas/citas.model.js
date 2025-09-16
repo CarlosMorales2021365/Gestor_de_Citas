@@ -17,9 +17,15 @@ const citasSchema = new Schema({
         type: Schema.ObjectId,
         ref: "User"
     },
+    correoUsuario:{
+        type: String
+    },
     candidato:{
         type: Schema.ObjectId,
         ref: "User"
+    },
+    correoCandidato:{
+        type: String
     },
     status:{
         type: Boolean,
