@@ -92,10 +92,19 @@ export const createCita = async (req, res) => {
 
 export const listarCitas = async (req, res) => {
   try {
-    const userId = req.usuario._id; 
+    const userId = req.usuario._id; // viene del token
+    const role = req.usuario.role;  // también del token
 
-    const citas = await Citas.find({ usuario: userId })
-      .populate("usuario", "nombre apellido empresa telefono")
+    // Definir filtro según rol
+    let filtro = {};
+    if (role === "CANDIDATO_ROLE") {
+      filtro = { candidato: userId };  // candidatos solo ven sus citas
+    } else if (role === "RECLUTADOR_ROLE") {
+      filtro = { usuario: userId };   // reclutadores ven solo las que crearon
+    }
+
+    const citas = await Citas.find(filtro)
+      .populate("usuario", "nombre apellido empresa telefono email")
       .populate("candidato", "nombre apellido email telefono");
 
     return res.status(200).json({
@@ -103,6 +112,7 @@ export const listarCitas = async (req, res) => {
       citas
     });
   } catch (error) {
+    console.error("❌ Error en listarCitas:", error);
     return res.status(500).json({
       success: false,
       message: "Error al listar citas",
