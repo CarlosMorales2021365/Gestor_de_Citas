@@ -31,6 +31,10 @@ const citasSchema = new Schema({
         type: Boolean,
         default: true
     },
+    recordatorioEnviado: {
+        type: Boolean,
+        default: false
+    },
 },{
     versionKey: false,
     timestamps: true
