@@ -11,3 +11,11 @@ export const listarCitasValidator = [
 export const getCitasByFechaValidator = [
     validateJWT
 ]
+
+export const moverCitaValidator = [
+  validateJWT
+];
+
+export const getReclutadoresEmpresaValidator = [
+  validateJWT
+];
